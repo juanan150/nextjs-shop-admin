@@ -1,7 +1,8 @@
 import { useRef, useState } from "react";
-import { useRouter } from 'next/router';
+import { useRouter } from "next/router";
 import { LockClosedIcon } from "@heroicons/react/24/solid";
 import { useAuth } from "@hooks/useAuth";
+import Image from "next/image";
 
 export default function LoginPage() {
   const emailRef = useRef(null);
@@ -18,7 +19,7 @@ export default function LoginPage() {
     auth
       .signIn(email, password)
       .then(() => {
-        router.push('/dashboard');
+        router.push("/dashboard");
       })
       .catch((error) => {
         if (error.response.data.statusCode === 401) {
@@ -34,7 +35,7 @@ export default function LoginPage() {
       <div className="min-h-full flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-md w-full space-y-8">
           <div>
-            <img className="mx-auto h-12 w-auto" src="https://tailwindui.com/img/logos/workflow-mark-indigo-600.svg" alt="Workflow" />
+            <Image className="mx-auto h-12 w-auto" src="https://tailwindui.com/img/logos/workflow-mark-indigo-600.svg" alt="Workflow" width={52} height={48} />
             <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">Sign in to your account</h2>
           </div>
           <form className="mt-8 space-y-6" onSubmit={handleSumbit}>
@@ -85,7 +86,7 @@ export default function LoginPage() {
               </div>
 
               <div className="text-sm">
-                <a href="/login" className="font-medium text-indigo-600 hover:text-indigo-500">
+                <a href="/edit" className="font-medium text-indigo-600 hover:text-indigo-500">
                   Forgot your password?
                 </a>
               </div>
