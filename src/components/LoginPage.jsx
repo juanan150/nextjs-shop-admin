@@ -1,4 +1,5 @@
-import { useRef } from "react";
+import { useRef, useState } from "react";
+import { useRouter } from 'next/router';
 import { LockClosedIcon } from "@heroicons/react/24/solid";
 import { useAuth } from "@hooks/useAuth";
 
@@ -6,15 +7,26 @@ export default function LoginPage() {
   const emailRef = useRef(null);
   const passwordRef = useRef(null);
   const auth = useAuth();
+  const [errorLogin, setErrorLogin] = useState(null);
+  const router = useRouter();
 
   const handleSumbit = (e) => {
     e.preventDefault();
     const email = emailRef.current.value;
     const password = passwordRef.current.value;
 
-    auth.signIn(email, password).then(() => {
-      console.log("Login Success");
-    });
+    auth
+      .signIn(email, password)
+      .then(() => {
+        router.push('/dashboard');
+      })
+      .catch((error) => {
+        if (error.response.data.statusCode === 401) {
+          setErrorLogin("Credenciales inválidas");
+        } else {
+          setErrorLogin("Algo ocurrió, intente de nuevo más tarde");
+        }
+      });
   };
 
   return (
@@ -59,7 +71,11 @@ export default function LoginPage() {
                 />
               </div>
             </div>
-
+            {errorLogin ? (
+              <div className="flex items-center justify-between">
+                <p>{errorLogin}</p>
+              </div>
+            ) : null}
             <div className="flex items-center justify-between">
               <div className="flex items-center">
                 <input id="remember-me" name="remember-me" type="checkbox" className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded" />
