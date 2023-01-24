@@ -1,12 +1,15 @@
+/* eslint-disable @next/next/no-img-element */
 import { useEffect, useState } from "react";
 // import Image from "next/image";
 import axios from "axios";
 import { CheckIcon } from "@heroicons/react/20/solid";
+import { XCircleIcon } from "@heroicons/react/24/solid";
 import Modal from "@common/Modal";
 import FormProduct from "@components/FormProducts";
 import endpoints from "@services/api";
 import { useAlert } from "@hooks/useAlert";
 import Alert from "@common/Alert";
+import { deleteProduct } from "@services/api/product";
 
 const PRODUCT_LIMIT = 10;
 const PRODUCT_OFFSET = 0;
@@ -40,6 +43,16 @@ const Products = () => {
     }));
   };
 
+  const handleDelete = (id) => {
+    deleteProduct(id).then(() => {
+      setAlert({
+        active: true,
+        message: "Item deleted",
+        type: "success",
+        autoClose: true,
+      });
+    });
+  };
 
   return (
     <>
@@ -116,9 +129,7 @@ const Products = () => {
                         </a>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <a href="/edit" className="text-indigo-600 hover:text-indigo-900">
-                          Delete
-                        </a>
+                        <XCircleIcon className="flex-shrink-0 h-6 w-6 text-gray-400 cursor-pointer" onClick={() => handleDelete(product.id)} aria-hidden="true" />
                       </td>
                     </tr>
                   ))}
