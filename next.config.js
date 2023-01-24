@@ -10,6 +10,18 @@ const nextConfig = {
         port: '',
         pathname: '/image/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'placeimg.com',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'www.pexels.com',
+        port: '',
+        pathname: '/**',
+      },
     ],
   }
 };

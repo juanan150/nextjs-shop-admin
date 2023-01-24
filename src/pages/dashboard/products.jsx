@@ -1,23 +1,37 @@
-import { useState } from "react";
-import Image from "next/image";
-import useFetch from "@hooks/useFetch";
+import { useEffect, useState } from "react";
+// import Image from "next/image";
+import axios from "axios";
+import { CheckIcon } from "@heroicons/react/20/solid";
+import Modal from "@common/Modal";
+import FormProduct from "@components/FormProducts";
 import endpoints from "@services/api";
-import { Chart } from "@common/Chart";
+import { useAlert } from "@hooks/useAlert";
+import Alert from "@common/Alert";
 
 const PRODUCT_LIMIT = 10;
 const PRODUCT_OFFSET = 0;
 
-export default function Dashboard() {
+const Products = () => {
   const [productsInfo, setProductInfo] = useState({
     limit: PRODUCT_LIMIT,
     offset: PRODUCT_OFFSET,
   });
-  const products = useFetch(endpoints.products.getProducts(productsInfo.limit, productsInfo.offset));
+  const [products, setProducts] = useState([]);
+  const [open, setOpen] = useState(false);
+  const { alert, setAlert, toggleAlert } = useAlert();
 
-  const categoryNames = products?.map(p => p.category);
-  const categoryCount = categoryNames?.map(c => c.name);
+  useEffect(() => {
+    async function getProducts() {
+      const response = await axios.get(endpoints.products.allProducts);
+      setProducts(response.data);
+    }
 
-  const countOccurrences = (arr) => arr.reduce((prev, curr) => ((prev[curr] = ++prev[curr] || 1), prev), {});
+    try {
+      getProducts();
+    } catch (error) {
+      console.log(error);
+    }
+  }, [alert]);
 
   const handlePagination = (type) => {
     setProductInfo((PrevState) => ({
@@ -26,20 +40,28 @@ export default function Dashboard() {
     }));
   };
 
-  const data = {
-    datasets: [
-      {
-        label: "Categories",
-        data: countOccurrences(categoryCount),
-        borderWidth: 2,
-        backgroundColor: ["#ffbb11", "#c0c0c0", "#50AF95", "#f3ba2f", "#2a71d0"],
-      },
-    ],
-  };
 
   return (
     <>
-      <Chart className="mb-8 mt-2" chartData={data} />
+      <Alert alert={alert} handleClose={toggleAlert} />
+      <div className="lg:flex lg:items-center lg:justify-between mb-8">
+        <div className="min-w-0 flex-1">
+          <h2 className="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight">Products List</h2>
+        </div>
+        <div className="mt-5 flex lg:mt-0 lg:ml-4">
+          <span className="sm:ml-3">
+            <button
+              type="button"
+              className="inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+              onClick={() => setOpen(true)}
+            >
+              <CheckIcon className="-ml-1 mr-2 h-5 w-5" aria-hidden="true" />
+              Add Product
+            </button>
+          </span>
+        </div>
+      </div>
+
       <div className="flex flex-col">
         <div className="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
           <div className="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
@@ -73,7 +95,7 @@ export default function Dashboard() {
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
                           <div className="flex-shrink-0 h-10 w-10">
-                            <Image className="h-10 w-10 rounded-full" src={product.images[0]} alt="" width={20} height={20} />
+                            <img className="h-10 w-10 rounded-full" src={product.images[0]} alt="" width={20} height={20} />
                           </div>
                           <div className="ml-4">
                             <div className="text-sm font-medium text-gray-900">{product.name}</div>
@@ -140,6 +162,11 @@ export default function Dashboard() {
           </nav>
         </div>
       </div>
+      <Modal open={open} setOpen={setOpen}>
+        <FormProduct setOpen={setOpen} setAlert={setAlert} />
+      </Modal>
     </>
   );
-}
+};
+
+export default Products;
